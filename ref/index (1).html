@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Артём Чернышов — кандидат в Совет «Новые»</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Палитра на основе #21b1a6 */
+            --color-accent: #21b1a6;
+            --color-accent-dim: #1a8f85;
+            --color-accent-soft: #0e5c56;
+            --color-accent-glow: rgba(33, 177, 166, 0.12);
+            --color-bg: #0a1214;
+            --color-bg-elevated: #102022;
+            --color-bg-deeper: #080e10;
+            --color-surface: #122628;
+            --color-border: #1c383c;
+            --color-border-soft: #142a2e;
+            --color-text: #f0f5f4;
+            --color-text-muted: #8ba5a7;
+            --color-text-faint: #5a7477;
+
+            /* Типографика */
+            --font-display: 'Unbounded', 'Unbounded', sans-serif;
+            --font-body: 'Manrope', 'Manrope', sans-serif;
+
+            /* Размеры */
+            --text-nav: 11px;
+            --text-label: 10px;
+            --text-small: 14px;
+            --text-body: 17px;
+            --text-body-lg: 22px;
+            --text-heading-sm: 28px;
+            --text-heading: 42px;
+            --text-display: 64px;
+            --text-hero: clamp(48px, 8vw, 96px);
+            --text-number: clamp(80px, 14vw, 160px);
+
+            /* Плотность */
+            --space-4: 4px;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --space-48: 48px;
+            --space-64: 64px;
+            --space-96: 96px;
+            --space-128: 128px;
+            --space-160: 160px;
+            --space-240: 240px;
+
+            /* Радиусы */
+            --radius-card: 0px;
+            --radius-button: 36px;
+            --radius-pill: 9999px;
+            --radius-none: 0px;
+
+            /* Настройки */
+            --max-width-content: 1200px;
+            --header-height: 60px;
+            --ease-out: cubic-bezier(0.19, 1, 0.22, 1);
+            --transition-smooth: 0.6s var(--ease-out);
+            --transition-fast: 0.3s var(--ease-out);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-family: var(--font-body);
+            font-weight: 400;
+            line-height: 1.6;
+            overflow-x: hidden;
+            letter-spacing: 0.01em;
+        }
+
+        /* ============ НАВИГАЦИЯ ============ */
+        .site-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            background: rgba(10, 18, 20, 0.82);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(28, 56, 60, 0.35);
+            transition: background 0.4s var(--ease-out);
+        }
+        .site-nav.scrolled {
+            background: rgba(10, 18, 20, 0.94);
+            border-bottom-color: rgba(28, 56, 60, 0.5);
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--color-text);
+            flex-shrink: 0;
+        }
+        .nav-logo img {
+            height: 32px;
+            width: auto;
+            display: block;
+            object-fit: contain;
+        }
+        .nav-logo-text {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--color-text);
+            white-space: nowrap;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            list-style: none;
+        }
+        .nav-links a {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: var(--text-nav);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            transition: color 0.25s var(--ease-out);
+            position: relative;
+            padding: 4px 0;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--color-accent);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.35s var(--ease-out);
+        }
+        .nav-links a:hover {
+            color: var(--color-text);
+        }
+        .nav-links a:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        .nav-links a.active {
+            color: var(--color-accent);
+        }
+        .nav-links a.active::after {
+            transform: scaleX(1);
+            background: var(--color-accent);
+        }
+        .mobile-nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            color: var(--color-text);
+            z-index: 101;
+        }
+        .mobile-nav-toggle svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        /* ============ ВЕРТИКАЛЬНАЯ МЕТКА ============ */
+        .vertical-label {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%) rotate(90deg);
+            transform-origin: right center;
+            z-index: 50;
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 9px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--color-text-faint);
+            white-space: nowrap;
+            pointer-events: none;
+            user-select: none;
+            transition: opacity 0.4s var(--ease-out);
+        }
+        .vertical-label span {
+            color: var(--color-accent);
+            opacity: 0.7;
+        }
+
+        /* ============ СЕКЦИИ ============ */
+        .section {
+            width: 100%;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .section-inner {
+            max-width: var(--max-width-content);
+            margin: 0 auto;
+            padding: 0 48px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ============ HERO ============ */
+        .hero {
+            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+            background: var(--color-bg);
+            border-bottom: 1px solid var(--color-border-soft);
+            overflow: hidden;
+        }
+        .hero-bg-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse at 70% 30%, rgba(33, 177, 166, 0.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 20% 70%, rgba(33, 177, 166, 0.03) 0%, transparent 45%),
+                var(--color-bg);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .hero-logo-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            pointer-events: none;
+            user-select: none;
+            opacity: 0.06;
+            width: 70vmin;
+            max-width: 800px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero-logo-bg img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+        .hero-photo-wrapper {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            z-index: 1;
+            width: min(45vw, 560px);
+            height: calc(100vh - var(--header-height) - 40px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            pointer-events: none;
+        }
+        .hero-photo-wrapper img {
+            max-height: 100%;
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            object-position: bottom right;
+            display: block;
+            user-select: none;
+            -webkit-user-drag: none;
+            opacity: 0.92;
+            transition: opacity 0.6s var(--ease-out);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            padding: calc(var(--header-height) + 40px) 48px 48px 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-start;
+            pointer-events: none;
+        }
+        .hero-tagline {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+        }
+        .hero-tagline::before {
+            content: '';
+            width: 32px;
+            height: 1px;
+            background: var(--color-accent);
+            display: block;
+        }
+        .hero-name {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: var(--text-hero);
+            line-height: 0.94;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            color: var(--color-text);
+            margin-bottom: 20px;
+            pointer-events: auto;
+        }
+        .hero-name .accent-dot {
+            color: var(--color-accent);
+        }
+        .hero-subtitle {
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: var(--text-body-lg);
+            line-height: 1.5;
+            color: var(--color-text-muted);
+            max-width: 480px;
+            pointer-events: auto;
+        }
+        .hero-cta-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+            pointer-events: auto;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-button);
+            transition: all 0.3s var(--ease-out);
+            cursor: pointer;
+            border: none;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(33, 177, 166, 0.5);
+            color: var(--color-accent);
+        }
+        .btn-outline:hover {
+            border-color: var(--color-accent);
+            background: var(--color-accent-glow);
+            color: var(--color-accent);
+        }
+        .btn-text-link {
+            background: none;
+            border: none;
+            padding: 4px 0;
+            color: var(--color-text-muted);
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-bottom: 1px solid var(--color-text-faint);
+            transition: color 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+            cursor: pointer;
+        }
+        .btn-text-link:hover {
+            color: var(--color-text);
+            border-color: var(--color-text);
+        }
+        .hero-meta {
+            position: absolute;
+            bottom: 32px;
+            left: 48px;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 9px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--color-text-faint);
+            pointer-events: none;
+        }
+        .hero-meta .sep {
+            width: 1px;
+            height: 16px;
+            background: var(--color-border);
+            display: block;
+        }
+
+        /* ============ ДЕЛИТЕЛИ ============ */
+        .divider-dashed {
+            border: none;
+            border-top: 1px dashed var(--color-border);
+            margin: 0;
+            width: 100%;
+        }
+        .divider-solid {
+            border: none;
+            border-top: 1px solid var(--color-border-soft);
+            margin: 0;
+            width: 100%;
+        }
+
+        /* ============ СЕКЦИЯ ИНТРО ============ */
+        .intro-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: var(--color-bg-deeper);
+            border-bottom: 1px solid var(--color-border-soft);
+            padding: calc(var(--header-height) + 48px) 0 48px 0;
+        }
+        .intro-label {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-bottom: 32px;
+        }
+        .intro-heading {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: clamp(24px, 3.6vw, 42px);
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            color: var(--color-text);
+            margin-bottom: 32px;
+            text-transform: uppercase;
+            max-width: 750px;
+        }
+        .intro-body {
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: var(--text-body-lg);
+            line-height: 1.65;
+            color: var(--color-text-muted);
+            max-width: 680px;
+            margin-bottom: 24px;
+        }
+        .intro-body strong {
+            color: var(--color-text);
+            font-weight: 600;
+        }
+        .intro-body .accent {
+            color: var(--color-accent);
+            font-weight: 500;
+        }
+
+        /* ============ СЕКЦИИ ПРОГРАММЫ ============ */
+        .program-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: var(--color-bg);
+            border-bottom: 1px solid var(--color-border-soft);
+            padding: calc(var(--header-height) + 48px) 0 48px 0;
+            position: relative;
+        }
+        .program-section:nth-child(even) {
+            background: var(--color-bg-deeper);
+        }
+        .program-grid {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 48px;
+            align-items: center; /* Изменено с start на center для вертикального выравнивания номера */
+            width: 100%;
+        }
+        .program-number {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: var(--text-number);
+            line-height: 0.85;
+            color: var(--color-accent);
+            opacity: 0.35;
+            user-select: none;
+            letter-spacing: -0.04em;
+            position: sticky;
+            top: calc(var(--header-height) + 24px);
+        }
+        .program-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 720px;
+        }
+        .program-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: clamp(22px, 3.2vw, 38px);
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+            text-transform: uppercase;
+            color: var(--color-text);
+        }
+        .program-body {
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: var(--text-body);
+            line-height: 1.7;
+            color: var(--color-text-muted);
+            max-width: 640px;
+        }
+        .program-body strong {
+            color: var(--color-text);
+            font-weight: 600;
+        }
+        .program-body .accent {
+            color: var(--color-accent);
+            font-weight: 500;
+        }
+        .program-subitems {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 8px;
+        }
+        .program-subitem {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: var(--text-body);
+            line-height: 1.6;
+            color: var(--color-text-muted);
+            border-left: 2px solid var(--color-accent);
+            padding-left: 16px;
+            margin-left: -2px;
+        }
+        .program-subitem .accent {
+            color: var(--color-accent);
+            font-weight: 500;
+        }
+        .program-tag {
+            display: inline-block;
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 9px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            border: 1px solid rgba(33, 177, 166, 0.4);
+            border-radius: var(--radius-pill);
+            padding: 4px 14px;
+            align-self: flex-start;
+        }
+
+        /* ============ СЕКЦИЯ ДОВЕРИЯ ============ */
+        .trust-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: var(--color-bg-deeper);
+            border-bottom: 1px solid var(--color-border-soft);
+            padding: calc(var(--header-height) + 48px) 0 48px 0;
+        }
+        .trust-heading {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: clamp(22px, 3vw, 36px);
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+            text-transform: uppercase;
+            color: var(--color-text);
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+        .trust-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border-top: 1px solid var(--color-border);
+        }
+        .trust-item {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 32px;
+            padding: 28px 0;
+            border-bottom: 1px solid var(--color-border);
+            align-items: start;
+            transition: background 0.3s var(--ease-out);
+        }
+        .trust-item:hover {
+            background: rgba(33, 177, 166, 0.03);
+        }
+        .trust-item-label {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            padding-top: 4px;
+        }
+        .trust-item-text {
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: var(--text-body);
+            line-height: 1.65;
+            color: var(--color-text-muted);
+        }
+        .trust-item-text strong {
+            color: var(--color-text);
+            font-weight: 600;
+        }
+
+        /* ============ СЕКЦИЯ ОКРУГА (КАРТА) ============ */
+        .district-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: var(--color-bg);
+            border-bottom: 1px solid var(--color-border-soft);
+            padding: calc(var(--header-height) + 48px) 0 48px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .district-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+            width: 100%;
+        }
+        .district-info {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .district-label {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+        }
+        .district-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: clamp(24px, 3.4vw, 40px);
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+            text-transform: uppercase;
+            color: var(--color-text);
+        }
+        .district-body {
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: var(--text-body);
+            line-height: 1.7;
+            color: var(--color-text-muted);
+            max-width: 440px;
+        }
+        .district-map-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+        .district-map-wrapper img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            filter: grayscale(85%) brightness(0.65) contrast(1.05) sepia(0.1) hue-rotate(140deg);
+            opacity: 0.75;
+            transition: filter 0.6s var(--ease-out), opacity 0.6s var(--ease-out);
+        }
+        .district-map-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at center, transparent 40%, rgba(10, 18, 20, 0.75) 100%),
+                radial-gradient(ellipse at 60% 50%, rgba(33, 177, 166, 0.06) 0%, transparent 45%);
+            pointer-events: none;
+            border-radius: 0;
+        }
+
+        /* ============ ФУТЕР ============ */
+        .footer {
+            background: var(--color-bg-deeper);
+            border-top: 1px solid var(--color-border-soft);
+            padding: 48px 0 24px 0;
+        }
+        .footer-inner {
+            max-width: var(--max-width-content);
+            margin: 0 auto;
+            padding: 0 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .footer-brand img {
+            height: 28px;
+            width: auto;
+            object-fit: contain;
+            display: block;
+        }
+        .footer-brand-text {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--color-text-faint);
+        }
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        .footer-links a {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            transition: color 0.25s var(--ease-out);
+        }
+        .footer-links a:hover {
+            color: var(--color-accent);
+        }
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-top: 1px solid var(--color-border-soft);
+            padding-top: 20px;
+        }
+        .footer-copy {
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: 11px;
+            color: var(--color-text-faint);
+            letter-spacing: 0.04em;
+        }
+        .footer-note {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--color-text-faint);
+        }
+        .footer-note span {
+            color: var(--color-accent);
+            opacity: 0.7;
+        }
+
+        /* ============ МЕДИАЗАПРОСЫ ============ */
+        @media (max-width: 1024px) {
+            .hero-photo-wrapper {
+                width: min(50vw, 480px);
+                height: calc(100vh - var(--header-height) - 20px);
+            }
+            .program-grid {
+                grid-template-columns: 90px 1fr;
+                gap: 32px;
+            }
+            .district-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            .district-map-wrapper {
+                min-height: 300px;
+            }
+            .trust-item {
+                grid-template-columns: 160px 1fr;
+                gap: 24px;
+            }
+        }
+        @media (max-width: 768px) {
+            .site-nav {
+                padding: 0 16px;
+            }
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: var(--header-height);
+                left: 0;
+                right: 0;
+                background: rgba(10, 18, 20, 0.96);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 24px 16px 16px;
+                gap: 16px;
+                border-bottom: 1px solid var(--color-border);
+                z-index: 99;
+            }
+            .nav-links.open {
+                display: flex;
+            }
+            .mobile-nav-toggle {
+                display: block;
+            }
+            .vertical-label {
+                display: none;
+            }
+            .hero {
+                height: auto;
+                min-height: 100svh;
+            }
+            .hero-logo-bg {
+                width: 80vmin;
+                opacity: 0.04;
+            }
+            .hero-content {
+                padding: calc(var(--header-height) + 32px) 20px 24px 20px;
+                justify-content: flex-end;
+            }
+            .hero-name {
+                font-size: clamp(32px, 10vw, 56px);
+                line-height: 1;
+            }
+            .hero-subtitle {
+                font-size: 15px;
+                max-width: 100%;
+            }
+            .hero-photo-wrapper {
+                position: relative;
+                width: 100%;
+                height: auto;
+                max-height: 50vh;
+                justify-content: center;
+                align-items: flex-end;
+                margin-top: 16px;
+                order: 2;
+            }
+            .hero-photo-wrapper img {
+                max-height: 45vh;
+                object-position: bottom center;
+            }
+            .hero-meta {
+                position: static;
+                margin-top: 20px;
+                padding: 0 20px 16px 20px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .section-inner {
+                padding: 0 20px;
+            }
+            .intro-section,
+            .program-section,
+            .trust-section,
+            .district-section {
+                min-height: auto;
+                padding: 80px 0 48px 0;
+            }
+            .program-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                display: flex;
+                flex-direction: column;
+            }
+            /* Номер теперь под контентом на мобильных */
+            .program-number {
+                font-size: 56px;
+                position: static;
+                opacity: 0.5;
+                order: 2;
+                align-self: flex-start;
+            }
+            .program-content {
+                order: 1;
+            }
+            .program-title {
+                font-size: 24px;
+            }
+            .program-body {
+                font-size: 15px;
+            }
+            .program-subitem {
+                font-size: 14px;
+            }
+            .trust-heading {
+                font-size: 24px;
+                margin-bottom: 24px;
+            }
+            .trust-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 20px 0;
+            }
+            .district-grid {
+                gap: 32px;
+            }
+            .district-map-wrapper {
+                min-height: 200px;
+            }
+            .footer-inner {
+                padding: 0 20px;
+            }
+            .footer-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .footer-links {
+                align-items: flex-start;
+            }
+        }
+        @media (max-width: 480px) {
+            .hero-name {
+                font-size: 30px;
+            }
+            .hero-cta-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .program-number {
+                font-size: 44px;
+            }
+            .intro-heading {
+                font-size: 20px;
+            }
+            .intro-body {
+                font-size: 16px;
+            }
+            .btn {
+                font-size: 10px;
+                padding: 10px 18px;
+            }
+        }
+
+        /* ============ АНИМАЦИИ (только при hover / focus) ============ */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        @media (prefers-reduced-motion: no-preference) {
+            .hero-name {
+                animation: fadeUp 1s var(--ease-out) both;
+                animation-delay: 0.15s;
+            }
+            .hero-tagline {
+                animation: fadeUp 1s var(--ease-out) both;
+                animation-delay: 0.05s;
+            }
+            .hero-subtitle {
+                animation: fadeUp 1s var(--ease-out) both;
+                animation-delay: 0.3s;
+            }
+            .hero-cta-row {
+                animation: fadeUp 1s var(--ease-out) both;
+                animation-delay: 0.45s;
+            }
+            .hero-photo-wrapper {
+                animation: fadeInPhoto 1.4s var(--ease-out) both;
+                animation-delay: 0.25s;
+            }
+            @keyframes fadeUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @keyframes fadeInPhoto {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 0.92;
+                    transform: translateY(0);
+                }
+            }
+        }
+
+        /* ============ УТИЛИТЫ ============ */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        .text-accent {
+            color: var(--color-accent);
+        }
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============ НАВИГАЦИЯ ============ -->
+    <nav class="site-nav" id="siteNav" role="navigation" aria-label="Основная навигация">
+        <a href="#" class="nav-logo" aria-label="Логотип Новые">
+            <img src="./logo.png" alt="Логотип движения «Новые»" onerror="this.style.display='none'">
+            <span class="nav-logo-text">Артём Чернышов</span>
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#program">Программа</a></li>
+            <li><a href="#trust">Позиция</a></li>
+            <li><a href="#district">Округ</a></li>
+        </ul>
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Открыть меню" aria-expanded="false">
+            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+        </button>
+    </nav>
+
+    <!-- ============ ВЕРТИКАЛЬНАЯ МЕТКА ============ -->
+    <div class="vertical-label" aria-hidden="true">
+        Медийный одномандатный округ <span>·</span> 2026
+    </div>
+
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="hero" aria-label="Главный экран">
+        <div class="hero-bg-glow" aria-hidden="true"></div>
+        <!-- Крупный логотип на фоне -->
+        <div class="hero-logo-bg" aria-hidden="true">
+            <img src="./logo.png" alt="" loading="lazy" />
+        </div>
+        <!-- Фото Артёма — встроено снизу, без рамки -->
+        <div class="hero-photo-wrapper" aria-hidden="true">
+            <img src="./notbg.png" alt="Артём Чернышов — кандидат в Совет движения «Новые»" loading="eager" />
+        </div>
+
+        <div class="hero-content">
+            <p class="hero-tagline">Кандидат в члены Совета</p>
+            <h1 class="hero-name">
+                Артём<br />
+                Чернышов<span class="accent-dot">.</span>
+            </h1>
+            <p class="hero-subtitle">
+                Молодёжное движение «Новые». Медийный одномандатный округ.
+                Говорю как есть — и делаю то, что можно проверить.
+            </p>
+            <div class="hero-cta-row">
+                <a href="#program" class="btn btn-outline">Читать программу</a>
+                <a href="#district" class="btn-text-link">Мой округ</a>
+            </div>
+        </div>
+
+        <div class="hero-meta" aria-hidden="true">
+            <span>Фракция «Федералисты»</span>
+            <span class="sep"></span>
+            <span>Совет движения</span>
+        </div>
+    </section>
+
+    <!-- ============ ИНТРО ============ -->
+    <section class="intro-section" aria-label="Вступление">
+        <div class="section-inner">
+            <p class="intro-label">Честно</p>
+            <h2 class="intro-heading">
+                Если вы настроены скептически —<br />этот текст для вас
+            </h2>
+            <p class="intro-body">
+                Знаю, о чём вы думаете: <strong>«фракция с очередными обещаниями»</strong>,
+                «после выборов всё равно ничего не изменится», «зачем мне устав, я пришёл не
+                бумажки читать». Справедливо. Именно поэтому я не обещаю революцию — я предлагаю
+                <span class="accent">три конкретные вещи, которые можно проверить</span>, а не просто поверить на слово.
+            </p>
+        </div>
+    </section>
+
+    <hr class="divider-dashed" aria-hidden="true" />
+
+    <!-- ============ ПРОГРАММА: 01 УСТАВ ============ -->
+    <section class="program-section" id="program" aria-label="Пункт 1 — Устав">
+        <div class="section-inner">
+            <div class="program-grid">
+                <div class="program-number no-select" aria-hidden="true">01</div>
+                <div class="program-content">
+                    <span class="program-tag">Устав</span>
+                    <h3 class="program-title">Скучно — но именно<br />поэтому важно</h3>
+                    <p class="program-body">
+                        Да, это не самая эффектная тема для предвыборной программы. Но подумайте:
+                        <strong>без устава любое решение можно оспорить</strong>, любой конфликт —
+                        превратить в «кто главнее». Александр Асалханов взял на себя один из самых
+                        сложных документов организации — и за месяц проделал серьёзную подготовительную работу.
+                    </p>
+                    <p class="program-body">
+                        Устав такого масштаба физически не пишется за несколько недель. Наша команда
+                        с самого начала подключилась к этой работе и подготовила конкретный инструмент —
+                        <span class="accent">памятку политлидера</span>, которая уже сейчас упрощает работу с документом.
+                    </p>
+                    <p class="program-body">
+                        <strong>Наша задача — довести эту работу до результата.</strong> Не начать заново,
+                        а закрыть вопрос, над которым уже идёт работа.
+                    </p>
+                    <div class="program-subitems">
+                        <div class="program-subitem">
+                            <span><span class="accent">→</span> Памятка политлидера уже готова и работает — это не обещание, а инструмент.</span>
+                        </div>
+                        <div class="program-subitem">
+                            <span><span class="accent">→</span> Спросите себя: что происходит, когда правил нет и решает тот, у кого больше связей?</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ПРОГРАММА: 02 МЦСИ ============ -->
+    <section class="program-section" aria-label="Пункт 2 — МЦСИ">
+        <div class="section-inner">
+            <div class="program-grid">
+                <div class="program-number no-select" aria-hidden="true">02</div>
+                <div class="program-content">
+                    <span class="program-tag">МЦСИ</span>
+                    <h3 class="program-title">Решения принимаются<br />не «на глазок»</h3>
+                    <p class="program-body">
+                        Скептики скажут: <strong>«очередной центр, очередная бюрократия»</strong>.
+                        Но разница в том, что мы не создаём новую структуру — мы делаем существующую рабочей,
+                        разделяя её на два понятных отдела:
+                    </p>
+                    <div class="program-subitems">
+                        <div class="program-subitem">
+                            <span><strong>Отдел формирования опросов</strong> — задаём правильные вопросы.</span>
+                        </div>
+                        <div class="program-subitem">
+                            <span><strong>Отдел аналитики</strong> — получаем не мнения, а данные.</span>
+                        </div>
+                    </div>
+                    <p class="program-body">
+                        Если вы считаете, что решения в организации принимаются <em>«потому что кому-то так
+                        показалось»</em> — вот мой ответ на это. <span class="accent">Данные вместо интуиции.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ПРОГРАММА: 03 ОБРАЗОВАТЕЛЬНАЯ ПЛОЩАДКА ============ -->
+    <section class="program-section" aria-label="Пункт 3 — Образовательная площадка">
+        <div class="section-inner">
+            <div class="program-grid">
+                <div class="program-number no-select" aria-hidden="true">03</div>
+                <div class="program-content">
+                    <span class="program-tag">Образование</span>
+                    <h3 class="program-title">Не для галочки,<br />а для тех, кто хочет</h3>
+                    <p class="program-body">
+                        Мы хотим разбирать,
+                        как устроена и как действует <strong>Администрация Президента</strong>, и почему
+                        политическая стабильность — это не слово из учебника, а условие, при котором
+                        вообще возможны любые изменения.
+                    </p>
+                    <p class="program-body">
+                        Можно сказать «это скучно» или «это не нужно молодёжи». Но внутренняя политика
+                        и социальная архитектура — это направления, где <span class="accent">реально мало
+                        конкуренции и много возможностей</span> для тех, кто разберётся первым.
+                    </p>
+                    <p class="program-body">
+                        Я не зову на лекции ради галочки. <strong>Зову тех, кто хочет понимать,
+                        как устроена система, чтобы уметь в ней работать.</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ПРОГРАММА: 04 ОТКРЫТОСТЬ ДВИЖЕНИЯ ============ -->
+    <section class="program-section" aria-label="Пункт 4 — Открытость движения">
+        <div class="section-inner">
+            <div class="program-grid">
+                <div class="program-number no-select" aria-hidden="true">04</div>
+                <div class="program-content">
+                    <span class="program-tag">Открытость</span>
+                    <h3 class="program-title">Движение должно<br />быть видимым</h3>
+                    <p class="program-body">
+                        Совет должен сопутствовать продвижению движения в массы. Однако наши соцсети,
+                        особенно телеграм, иногда могут показаться <strong>скучными и неживыми</strong>.
+                        В связи с этим предлагаю:
+                    </p>
+                    <div class="program-subitems">
+                        <div class="program-subitem">
+                            <span><strong>Квоты фракциям на публикации</strong> в уже раскрученные каналы движения — с учётом статистики в личную и в фракционную.</span>
+                        </div>
+                        <div class="program-subitem">
+                            <span><strong>Публикация внутренней жизни движения:</strong> освещение выборов, инициатив, бэкстейджи и прочее.</span>
+                        </div>
+                        <div class="program-subitem">
+                            <span><strong>Подотчётность штабов Совету</strong> — не в виде официальных шаблонных отписок, а в формате регулярных отчётных видеороликов с собраний штаба.</span>
+                        </div>
+                    </div>
+                    <p class="program-body">
+                        <span class="accent">Открытость — это не абстрактный лозунг.</span> Это квоты,
+                        публикации, видеоотчёты. Конкретные механизмы, которые можно запустить и проверить.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ СЕКЦИЯ ДОВЕРИЯ ============ -->
+    <section class="trust-section" id="trust" aria-label="Почему нам стоит верить">
+        <div class="section-inner">
+            <h2 class="trust-heading">
+                Почему мне<br />стоит верить
+            </h2>
+            <div class="trust-items">
+                <div class="trust-item">
+                    <span class="trust-item-label">Уже сделано</span>
+                    <span class="trust-item-text">
+                        Каждый пункт программы — либо <strong>уже начатая работа</strong> (памятка политлидера),
+                        либо <strong>конкретная структура с понятными результатами</strong> (отделы МЦСИ),
+                        либо <strong>ясно сформулированная цель</strong> (образовательная площадка).
+                    </span>
+                </div>
+                <div class="trust-item">
+                    <span class="trust-item-label">Проверяемо</span>
+                    <span class="trust-item-text">
+                        Я не прошу доверия авансом. Судите не по словам на этом экране, а по тому,
+                        <strong>что будет сделано после выборов</strong> — и спрашивайте с меня
+                        за каждый пункт.
+                    </span>
+                </div>
+                <div class="trust-item">
+                    <span class="trust-item-label">Без иллюзий</span>
+                    <span class="trust-item-text">
+                        Я не обещаю революцию. Я предлагаю <strong>три конкретные вещи, которые можно
+                        проверить, а не просто поверить на слово</strong>. Это честный подход.
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ СЕКЦИЯ ОКРУГА (КАРТА) ============ -->
+    <section class="district-section" id="district" aria-label="Медийный одномандатный округ">
+        <div class="section-inner">
+            <div class="district-grid">
+                <div class="district-info">
+                    <p class="district-label">Медийный одномандатный округ</p>
+                    <h2 class="district-title">
+                        Где я работаю<br />и за что отвечаю
+                    </h2>
+                    <p class="district-body">
+                        Совет должен сопутствовать продвижению движения в массы. Медийный округ — это
+                        территория коммуникации: соцсети, телеграм-каналы, публичное освещение выборов
+                        и внутренних инициатив. <strong>Здесь важна видимость</strong> — и я за то, чтобы голос нашего движения был услышан.
+                    </p>
+                    <p class="district-body">
+                        Открытость штабов, квоты на публикации, видеоотчёты — всё это части одной
+                        задачи: <span class="accent">сделать движение по-настоящему живым и доступным</span>.
+                    </p>
+                </div>
+                <div class="district-map-wrapper" aria-hidden="true">
+                    <img src="./russia.png" alt="Карта России — медийный одномандатный округ" loading="lazy" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ФУТЕР ============ -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="./logo.png" alt="Логотип движения «Новые»" onerror="this.style.display='none'">
+                    <span class="footer-brand-text">Артём Чернышов · фракция «Федералисты»</span>
+                </div>
+                <div class="footer-links">
+                    <a href="#program">Программа</a>
+                    <a href="#trust">Позиция</a>
+                    <a href="#district">Округ</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span class="footer-copy">© 2026 Артём Чернышов. Молодёжное движение «Новые».</span>
+                <span class="footer-note">Медийный одномандатный округ <span>·</span> Совет движения</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            const nav = document.getElementById('siteNav');
+            const mobileToggle = document.getElementById('mobileNavToggle');
+            const navLinks = document.getElementById('navLinks');
+
+            // Изменение фона при прокрутке
+            let scrollTimeout;
+            window.addEventListener('scroll', function() {
+                if (scrollTimeout) cancelAnimationFrame(scrollTimeout);
+                scrollTimeout = requestAnimationFrame(function() {
+                    if (window.scrollY > 20) {
+                        nav.classList.add('scrolled');
+                    } else {
+                        nav.classList.remove('scrolled');
+                    }
+                });
+            }, { passive: true });
+
+            // Мобильное меню
+            mobileToggle.addEventListener('click', function() {
+                const isOpen = navLinks.classList.toggle('open');
+                mobileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                mobileToggle.setAttribute('aria-label', isOpen ? 'Закрыть меню' : 'Открыть меню');
+            });
+
+            // Закрытие меню при клике на ссылку
+            navLinks.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    navLinks.classList.remove('open');
+                    mobileToggle.setAttribute('aria-expanded', 'false');
+                    mobileToggle.setAttribute('aria-label', 'Открыть меню');
+                });
+            });
+
+            // Подсветка активного пункта навигации по скроллу
+            const sections = document.querySelectorAll('section[id], [id="program"], [id="trust"], [id="district"]');
+            const navAnchors = navLinks.querySelectorAll('a');
+            const observerOptions = {
+                root: null,
+                rootMargin: '-30% 0px -60% 0px',
+                threshold: 0
+            };
+            const sectionObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        const activeId = entry.target.id;
+                        navAnchors.forEach(function(anchor) {
+                            const href = anchor.getAttribute('href').replace('#', '');
+                            if (href === activeId) {
+                                anchor.classList.add('active');
+                            } else {
+                                anchor.classList.remove('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(function(section) {
+                sectionObserver.observe(section);
+            });
+
+            // Плавный скролл для якорных ссылок
+            document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+                anchor.addEventListener('click', function(e) {
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        e.preventDefault();
+                        const headerOffset = 60;
+                        const elementPosition = targetElement.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Обработка ошибок загрузки изображений
+            const imgs = document.querySelectorAll('img');
+            imgs.forEach(function(img) {
+                img.addEventListener('error', function() {
+                    this.style.display = 'none';
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

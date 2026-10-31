@@ -2,24 +2,10 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><title>Табло заседания</title>
-<style>
-body{font-family:system-ui;background:#0b1b2b;color:#fff;margin:0;padding:24px}
-h1{font-size:28px;margin:0 0 16px;font-weight:600}
-h2{font-size:22px;margin:0 0 12px}
-.big{font-size:52px;font-weight:700;line-height:1.1}
-.quorum{margin:8px 0 24px;font-size:22px}
-.green{color:#4ade80}.red{color:#f87171}.yellow{color:#facc15}
-.card{background:#132a44;border-radius:14px;padding:22px;margin-bottom:16px}
-table{width:100%;border-collapse:collapse}
-td{padding:8px 0;border-bottom:1px solid #1e3a5f;font-size:16px}
-.vote-row{display:flex;gap:24px;align-items:baseline;margin:16px 0}
-.vote-row .num{font-size:48px;font-weight:700}
-.vote-row .lbl{font-size:18px;opacity:.8}
-.veto{color:#f87171;font-size:20px;margin-top:12px}
-.timer{font-size:24px;color:#facc15;margin-bottom:16px}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="static/council.css">
 </head>
-<body>
+<body class="display-page"><header class="masthead"><a class="brand" href="/" aria-label="Малый совет — главная"><svg viewBox="0 0 64 72" fill="currentColor" aria-hidden="true"><path d="M3 12 32 3 61 12V18H3ZM10 23H54V53H47V30L36 42V53H28V42L17 30V53H10ZM3 58H61V65H3Z"/></svg><span><strong>МАЛЫЙ СОВЕТ</strong><small>ТЕРРИТОРИЯ РЕШЕНИЙ</small></span></a><div class="brand-note">Новые люди · Общее дело</div></header>
 <div id="err" style="color:#f87171"></div>
 <div id="root"></div>
 <script>

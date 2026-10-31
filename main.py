@@ -176,10 +176,10 @@ app = FastAPI(title="Система Совета")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
-def root(): return FileResponse("static/app.html")
+def root(): return FileResponse("app.html")
 
 @app.get("/board", response_class=HTMLResponse)
-def board_page(): return FileResponse("static/board.html")
+def board_page(): return FileResponse("board.html")
 
 @app.post("/api/auth/login")
 def login(body: LoginIn, db: DBSession = Depends(get_db)):
