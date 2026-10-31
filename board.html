@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><title>Табло заседания</title>
+<style>
+body{font-family:system-ui;background:#0b1b2b;color:#fff;margin:0;padding:24px}
+h1{font-size:28px;margin:0 0 16px;font-weight:600}
+h2{font-size:22px;margin:0 0 12px}
+.big{font-size:52px;font-weight:700;line-height:1.1}
+.quorum{margin:8px 0 24px;font-size:22px}
+.green{color:#4ade80}.red{color:#f87171}.yellow{color:#facc15}
+.card{background:#132a44;border-radius:14px;padding:22px;margin-bottom:16px}
+table{width:100%;border-collapse:collapse}
+td{padding:8px 0;border-bottom:1px solid #1e3a5f;font-size:16px}
+.vote-row{display:flex;gap:24px;align-items:baseline;margin:16px 0}
+.vote-row .num{font-size:48px;font-weight:700}
+.vote-row .lbl{font-size:18px;opacity:.8}
+.veto{color:#f87171;font-size:20px;margin-top:12px}
+.timer{font-size:24px;color:#facc15;margin-bottom:16px}
+</style>
+</head>
+<body>
+<div id="err" style="color:#f87171"></div>
+<div id="root"></div>
+<script>
+const $ = s => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+let t = params.get("t");
+let displayToken = localStorage.getItem("display_token");
+let meetingId = null, state = null, ws = null;
+let timerInterval = null;
+
+async function activate(){
+  if(!t){
+    if(!displayToken){ $("#err").textContent = "Нет токена. Откройте QR-ссылку."; return; }
+    const r = await fetch(`/api/display/${displayToken}/state`);
+    if(!r.ok){ $("#err").textContent = "Токен истёк."; return; }
+    const s = await r.json(); meetingId = s.meeting.id; state = s; connect(); render(); return;
+  }
+  const r = await fetch("/api/display/activate", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({t}) });
+  if(!r.ok){ $("#err").textContent = "QR недействителен или истёк."; return; }
+  const j = await r.json();
+  displayToken = j.display_token; meetingId = j.meeting_id;
+  localStorage.setItem("display_token", displayToken);
+  history.replaceState({}, "", "/board");
+  connect();
+}
+
+function connect(){
+  const proto = location.protocol === "https:" ? "wss" : "ws";
+  ws = new WebSocket(`${proto}://${location.host}/ws/${meetingId}?token=${displayToken}`);
+  ws.onmessage = ev => { const m = JSON.parse(ev.data); if(m.type==="state"){ state=m.state; render(); } };
+  ws.onclose = () => setTimeout(connect, 2000);
+}
+
+function render(){
+  if(!state) return;
+  const q = state.quorum;
+  const cur = state.current_question;
+  let h = `<h1>${state.meeting.title}</h1>
+    <div class="quorum">Кворум: <b>${q.present} / ${q.total}</b> —
+      <span class="${q.has_quorum?'green':'red'}">${q.has_quorum?'есть':'нет'}</span>
+    </div>`;
+
+  if(cur && cur.status === "opened"){
+    h += `<div class="card"><h2>${cur.title}</h2>`;
+    if(cur.text) h += `<p style="opacity:.85;margin:0 0 16px">${cur.text}</p>`;
+    if(cur.majority_type === "plurality" && cur.results.choices){
+      h += `<div class="vote-row"><span class="lbl">Идёт голосование. Кандидаты:</span></div>
+        <table>${cur.results.choices.map(c => `<tr><td>${c.text}</td><td style="text-align:right">${c.votes}</td></tr>`).join("")}</table>`;
+    } else {
+      h += `<div id="board-timer" class="timer"></div>
+        <div class="big yellow">ГОЛОСОВАНИЕ ИДЁТ</div>
+        <div class="big">Проголосовало: ${cur.results.voters} / ${q.present}</div>`;
+    }
+    h += `</div>`;
+  } else if(cur){
+    const r = cur.results;
+    h += `<div class="card"><h2>${cur.title}</h2>`;
+    if(cur.majority_type === "plurality" && r.choices){
+      h += `<table>${r.choices.map(c => `<tr><td>${c.text}</td><td style="text-align:right">${c.votes}</td></tr>`).join("")}</table>`;
+    } else {
+      h += `<div class="vote-row">
+        <span><span class="num green">${r.for}</span> <span class="lbl">за</span></span>
+        <span><span class="num red">${r.against}</span> <span class="lbl">против</span></span>
+        <span><span class="num yellow">${r.abstain}</span> <span class="lbl">воздерж.</span></span>
+      </div>`;
+    }
+    h += `<div class="big ${r.passed?'green':'red'}">${r.passed?'ПРИНЯТО':'НЕ ПРИНЯТО'}</div>`;
+    h += `<div style="font-size:18px;margin-top:8px;color:#aaa">${r.reason || ''}</div>`;
+    if(r.veto && !r.veto.overridden_at){ h += `<div class="veto">⚠ ВЕТО Председателя: ${r.veto.reason}</div>`; }
+    h += `</div>`;
+  } else {
+    h += `<div class="card"><h2>Повестка</h2><table>
+      ${state.questions.map(x=>`<tr><td>${x.order_num}. ${x.title}</td><td style="text-align:right">${x.status}</td></tr>`).join("") || "<tr><td><i>Пока пусто</i></td></tr>"}
+    </table></div>`;
+  }
+
+  const speaking = state.requests.filter(r => r.status === "granted" && r.type === "speak");
+  if(speaking.length){
+    h += `<div class="card"><h2>Слово предоставлено</h2><div class="big yellow">${speaking.map(s=>s.member_name).join(", ")}</div></div>`;
+  }
+
+  $("#root").innerHTML = h;
+  startTimer(cur);
+}
+
+function startTimer(cur) {
+  if (timerInterval) clearInterval(timerInterval);
+  if (!cur || cur.status !== "opened" || !cur.remote_deadline) return;
+  
+  timerInterval = setInterval(() => {
+    const left = Math.max(0, Math.floor(cur.remote_deadline - (Date.now() / 1000)));
+    const el = document.getElementById("board-timer");
+    if (!el) return;
+    if (left > 0) {
+      el.innerHTML = `⏳ Дистанционные голосуют: <b>${left} сек</b>`;
+      el.style.color = "#facc15";
+    } else {
+      el.innerHTML = `✅ Дистанционные завершили. Продолжают только очные.`;
+      el.style.color = "#888";
+    }
+  }, 1000);
+}
+
+activate();
+</script>
+</body>
+</html>
