@@ -2,55 +2,37 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><title>Совет</title>
-<style>
-body{font-family:system-ui;margin:0;background:#f5f6fa;color:#1a1a1a}
-.hidden{display:none}
-.wrap{max-width:1000px;margin:20px auto;padding:0 16px}
-.card{background:#fff;border-radius:10px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px #0001}
-.btn{padding:7px 12px;border:0;border-radius:6px;background:#2d6cdf;color:#fff;cursor:pointer;margin:2px;font-size:14px}
-.btn.sec{background:#888}.btn.red{background:#d33}.btn.green{background:#1a8}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-.row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #eee}
-.tag{font-size:12px;padding:2px 6px;border-radius:4px;background:#eef}
-.tag.warn{background:#fee;color:#a00}.tag.ok{background:#efe;color:#0a0}
-input,select,textarea{padding:6px;border:1px solid #ccc;border-radius:6px;width:100%;box-sizing:border-box;margin:4px 0;font-family:inherit}
-.big{font-size:20px;font-weight:600}
-.tabs{margin-bottom:12px}
-.tabs .btn{background:#e4e6ea;color:#333}
-.tabs .btn.active{background:#2d6cdf;color:#fff}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:700px){.grid2{grid-template-columns:1fr}}
-.vote-bar{display:flex;gap:8px;margin:8px 0}
-.vote-bar .btn{flex:1;padding:14px 8px;font-size:16px}
-.q-closed{background:#f0f0f0;padding:8px;border-radius:6px;margin-top:6px}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="static/council.css">
 </head>
 <body>
+<header class="masthead"><a class="brand" href="/" aria-label="Малый совет — главная"><svg viewBox="0 0 64 72" fill="currentColor" aria-hidden="true"><path d="M3 12 32 3 61 12V18H3ZM10 23H54V53H47V30L36 42V53H28V42L17 30V53H10ZM3 58H61V65H3Z"/></svg><span><strong>МАЛЫЙ СОВЕТ</strong><small>ТЕРРИТОРИЯ РЕШЕНИЙ</small></span></a><div class="brand-note">Новые люди · Общее дело</div></header>
 <div class="wrap">
-<div id="login" class="card">
-  <h2>Вход в систему Совета</h2>
-  <input id="lname" placeholder="ФИО (например, Чувилев Матфей)">
-  <input id="lpass" type="password" placeholder="Пароль">
-  <button class="btn" onclick="doLogin()">Войти</button>
-  <div id="lerr" style="color:#d33;margin-top:8px"></div>
-</div>
+<div id="login-layout" class="login-layout"><section class="login-intro"><div class="eyebrow">Рабочее пространство совета</div><h1>Вместе —<br>к новым<br><span>решениям.</span></h1><p>Повестка, голосования и совместная работа.<br>Всё, что нужно для продуктивного заседания.</p><div class="login-graphic" aria-hidden="true"><span></span><span></span><span></span></div></section><form id="login" class="card" onsubmit="event.preventDefault();doLogin()">
+  <div class="eyebrow">Личный кабинет</div><h2>Добро пожаловать</h2><p>Войдите, чтобы принять участие в работе совета.</p><label for="lname">Ваше имя</label>
+  <input autocomplete="username" required id="lname" placeholder="ФИО (например, Чувилев Матфей)">
+  <label for="lpass">Пароль</label><input autocomplete="current-password" required id="lpass" type="password" placeholder="Пароль">
+  <button type="submit" class="btn">Войти в пространство <span aria-hidden="true">↗</span></button>
+  <div id="lerr" role="alert" style="color:#bd4c42;margin-top:8px"></div>
 
+</form></div>
 <div id="app" class="hidden">
-  <div class="card">
-    <div class="row">
+<div class="page-heading"><div><div class="eyebrow">Рабочее пространство / Заседания</div><h1>Работа совета</h1><p>Каждый голос имеет значение.</p></div><span class="session-label">Малый совет · Новые люди</span></div>
+  <div class="card session-card">
+    <div class="session-top">
       <div><b id="who"></b> <span id="roles" class="tag"></span></div>
       <div>
         <select id="meetingSelect" onchange="switchMeeting()" style="width:auto;display:inline-block"></select>
         <button class="btn sec" onclick="logout()">Выйти</button>
       </div>
     </div>
-    <div id="quorum" class="big" style="margin-top:10px"></div>
-    <div style="font-size:12px;color:#888" id="meetingMeta"></div>
+    <div class="session-metrics"><div id="quorum" class="big" style="margin-top:10px"></div>
+    <div style="font-size:12px;color:#888" id="meetingMeta"></div></div>
   </div>
-  <div id="tabs" class="tabs"></div>
-  <div id="body"></div>
+<div class="workspace"><aside class="sidebar"><div class="sidebar-label">ПРОСТРАНСТВО</div><nav id="tabs" class="tabs" aria-label="Разделы совета"></nav><div class="sidebar-bottom"><strong>Общее дело.</strong>От обсуждения<br>к действию.</div></aside><main id="body"></main></div>
 </div>
 </div>
+<footer class="footer"><span>МАЛЫЙ СОВЕТ</span><span>Обсуждаем. Решаем. Действуем.</span></footer>
 <script>
 let token = localStorage.getItem("tok");
 let meetingId = null;
@@ -84,7 +66,7 @@ async function boot(){
   if(!token) return;
   try{ me = await api("/api/me"); }catch{ localStorage.removeItem("tok"); return; }
   const ms = await api("/api/meetings");
-  $("#login").classList.add("hidden");
+  $("#login-layout").classList.add("hidden");
   $("#app").classList.remove("hidden");
   $("#who").textContent = me.name;
   $("#roles").textContent = me.roles.map(r => ({member:"Член", chairman:"Председатель", secretary:"Секретарь"}[r] || r)).join(", ");
@@ -120,8 +102,8 @@ function renderTabs(){
   t.push(["files","Файлы"]);
   t.push(["boards","Доски"]);
   t.push(["protocol","Протокол"]);
-  $("#tabs").innerHTML = t.map(([k,n]) =>
-    `<button class="btn ${tab===k?'active':''}" onclick="showTab('${k}')">${n}</button>`).join("");
+  $("#tabs").innerHTML = t.map(([k,n],i) =>
+    `<button class="btn ${tab===k?'active':''}" aria-current="${tab===k?'page':'false'}" onclick="showTab('${k}')"><span class="nav-num">0${i+1}</span>${n}</button>`).join("");
 }
 function showTab(k){ tab = k; renderTabs(); render(); }
 
@@ -142,15 +124,15 @@ function render(){
 
 function renderMember(){
   const cur = state.current_question;
-  let html = `<div class="card"><h3>Повестка</h3>`;
+  let html = `<div class="member-layout"><div class="card agenda-card"><div class="section-kicker">ЗАСЕДАНИЕ <span>${state.questions.length} ВОПРОСОВ</span></div><h3 style="margin-top:17px">Повестка дня</h3>`;
   html += state.questions.map(q =>
-    `<div class="row"><span>${q.order_num}. ${q.title} <span class="tag">${({decision:"Решение",resolution:"Резолюция",election:"Выборы",amendment:"Поправка"}[q.kind]||q.kind)}</span></span>
+    `<div class="row"><span><span class="agenda-index">${String(q.order_num).padStart(2,"0")}</span>${q.title} <span class="tag">${({decision:"Решение",resolution:"Резолюция",election:"Выборы",amendment:"Поправка"}[q.kind]||q.kind)}</span></span>
      <span class="tag ${q.status==='closed'?'ok':q.status==='opened'?'warn':''}">${({pending:"Ожидает",opened:"Идёт",closed:"Завершено"}[q.status]||q.status)}</span></div>`
   ).join("") || "<i>Пока нет вопросов</i>";
   html += `</div>`;
 
   if(cur){
-    html += `<div class="card"><h3>${cur.title}</h3>`;
+    html += `<div class="card vote-card"><div class="section-kicker"><span><i class="live-dot"></i>${cur.status === "opened" ? "ГОЛОСОВАНИЕ ОТКРЫТО" : "ИТОГИ ГОЛОСОВАНИЯ"}</span></div><h3>${cur.title}</h3>`;
     if(cur.text) html += `<p>${cur.text}</p>`;
     if(cur.status === "opened"){
       html += `<div id="vote-timer" style="font-size:16px;margin-bottom:10px;color:#facc15"></div>`;
@@ -181,12 +163,13 @@ function renderMember(){
     html += `</div>`;
   }
 
-  html += `<div class="card"><h3>Мои запросы</h3>
+  html += `<div class="card requests-card"><h3>Участвуйте в обсуждении</h3><p>Запросите слово или задайте вопрос.</p>
     <button class="btn" onclick="req('speak')">Выступить</button>
     <button class="btn" onclick="req('question')">Вопрос</button>
     <button class="btn sec" onclick="reqDissent()">Особое мнение</button>
     <button class="btn sec" onclick="reqConflict()">Конфликт интересов</button>
   </div>`;
+  html += `</div>`;
   $("#body").innerHTML = html;
   startTimer(cur);
 }

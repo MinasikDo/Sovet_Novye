@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><title>Совет</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="static/council.css">
+</head>
+<body>
+<header class="masthead"><a class="brand" href="/" aria-label="Малый совет — главная"><svg viewBox="0 0 64 72" fill="currentColor" aria-hidden="true"><path d="M3 12 32 3 61 12V18H3ZM10 23H54V53H47V30L36 42V53H28V42L17 30V53H10ZM3 58H61V65H3Z"/></svg><span><strong>МАЛЫЙ СОВЕТ</strong><small>ТЕРРИТОРИЯ РЕШЕНИЙ</small></span></a><div class="brand-note">Новые люди · Общее дело</div></header>
+<div class="wrap">
+<div id="login-layout" class="login-layout"><section class="login-intro"><div class="eyebrow">Рабочее пространство совета</div><h1>Вместе —<br>к новым<br><span>решениям.</span></h1><p>Повестка, голосования и совместная работа.<br>Всё, что нужно для продуктивного заседания.</p><div class="login-graphic" aria-hidden="true"><span></span><span></span><span></span></div></section><form id="login" class="card" onsubmit="event.preventDefault();doLogin()">
+  <div class="eyebrow">Личный кабинет</div><h2>Добро пожаловать</h2><p>Войдите, чтобы принять участие в работе совета.</p><label for="lname">Ваше имя</label>
+  <input autocomplete="username" required id="lname" placeholder="ФИО (например, Чувилев Матфей)">
+  <label for="lpass">Пароль</label><input autocomplete="current-password" required id="lpass" type="password" placeholder="Пароль">
+  <button type="submit" class="btn">Войти в пространство <span aria-hidden="true">↗</span></button>
+  <div id="lerr" role="alert" style="color:#bd4c42;margin-top:8px"></div>
+
+</form></div>
+<div id="app" class="hidden">
+<div class="page-heading"><div><div class="eyebrow">Рабочее пространство / Заседания</div><h1>Работа совета</h1><p>Каждый голос имеет значение.</p></div><span class="session-label">Малый совет · Новые люди</span></div>
+  <div class="card session-card">
+    <div class="session-top">
+      <div><b id="who"></b> <span id="roles" class="tag"></span></div>
+      <div>
+        <select id="meetingSelect" onchange="switchMeeting()" style="width:auto;display:inline-block"></select>
+        <button class="btn sec" onclick="logout()">Выйти</button>
+      </div>
+    </div>
+    <div class="session-metrics"><div id="quorum" class="big" style="margin-top:10px"></div>
+    <div style="font-size:12px;color:#888" id="meetingMeta"></div></div>
+  </div>
+<div class="workspace"><aside class="sidebar"><div class="sidebar-label">ПРОСТРАНСТВО</div><nav id="tabs" class="tabs" aria-label="Разделы совета"></nav><div class="sidebar-bottom"><strong>Общее дело.</strong>От обсуждения<br>к действию.</div></aside><main id="body"></main></div>
+</div>
+</div>
+<footer class="footer"><span>МАЛЫЙ СОВЕТ</span><span>Обсуждаем. Решаем. Действуем.</span></footer>
+<script>
+let token = localStorage.getItem("tok");
+let meetingId = null;
+let me = null;
+let state = null;
+let ws = null;
+let tab = "member";
+let timerInterval = null;
+
+const $ = s => document.querySelector(s);
+
+async function api(path, method="GET", body){
+  const r = await fetch(path, {
+    method,
+    headers: {"Content-Type":"application/json", ...(token?{"Authorization":"Bearer "+token}:{})},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if(!r.ok){ const t = await r.json().catch(()=>({detail:"Ошибка"})); throw new Error(t.detail); }
+  return r.json();
+}
+
+async function doLogin(){
+  try{
+    const r = await api("/api/auth/login","POST", {name: $("#lname").value.trim(), password: $("#lpass").value});
+    token = r.token; localStorage.setItem("tok", token); boot();
+  }catch(e){ $("#lerr").textContent = "Ошибка: " + e.message; }
+}
+function logout(){ localStorage.removeItem("tok"); location.reload(); }
+
+async function boot(){
+  if(!token) return;
+  try{ me = await api("/api/me"); }catch{ localStorage.removeItem("tok"); return; }
+  const ms = await api("/api/meetings");
+  $("#login-layout").classList.add("hidden");
+  $("#app").classList.remove("hidden");
+  $("#who").textContent = me.name;
+  $("#roles").textContent = me.roles.map(r => ({member:"Член", chairman:"Председатель", secretary:"Секретарь"}[r] || r)).join(", ");
+  $("#meetingSelect").innerHTML = ms.map(x =>
+    `<option value="${x.id}">${x.title} [${x.status==='active'?'Идёт':x.status==='closed'?'Закрыто':'Подготовка'}]</option>`).join("");
+  if(ms.length){
+    meetingId = ms[0].id;
+    $("#meetingSelect").value = meetingId;
+    await refresh();
+    connectWS();
+  }
+  renderTabs();
+}
+
+function switchMeeting(){ meetingId = parseInt($("#meetingSelect").value); refresh(); connectWS(); }
+function connectWS(){
+  if(ws) ws.close();
+  const proto = location.protocol === "https:" ? "wss" : "ws";
+  ws = new WebSocket(`${proto}://${location.host}/ws/${meetingId}?token=${token}`);
+  ws.onmessage = ev => {
+    const msg = JSON.parse(ev.data);
+    if(msg.type === "state"){ state = msg.state; render(); }
+  };
+  ws.onclose = () => setTimeout(() => { if(meetingId) connectWS(); }, 2000);
+}
+
+async function refresh(){ state = await api(`/api/meetings/${meetingId}/state`); render(); }
+
+function renderTabs(){
+  const t = [["member","Мой бюллетень"]];
+  if(me.roles.includes("secretary")) t.push(["secretary","Секретарь"]);
+  if(me.roles.includes("chairman") || me.roles.includes("secretary")) t.push(["chairman","Очередь"]);
+  t.push(["files","Файлы"]);
+  t.push(["boards","Доски"]);
+  t.push(["protocol","Протокол"]);
+  $("#tabs").innerHTML = t.map(([k,n],i) =>
+    `<button class="btn ${tab===k?'active':''}" aria-current="${tab===k?'page':'false'}" onclick="showTab('${k}')"><span class="nav-num">0${i+1}</span>${n}</button>`).join("");
+}
+function showTab(k){ tab = k; renderTabs(); render(); }
+
+function render(){
+  if(!state) return;
+  const q = state.quorum;
+  $("#quorum").innerHTML = `Кворум: <b>${q.present} / ${q.total}</b> (нужно ≥ ${q.needed}) — ` +
+    (q.has_quorum ? "<span class='tag ok'>есть</span>" : "<span class='tag warn'>НЕТ</span>");
+  $("#meetingMeta").textContent = `${state.meeting.title} · Формат: ${({present:"Очный",remote:"Дистанционный",mixed:"Смешанный"}[state.meeting.format]||state.meeting.format)}`;
+
+  if(tab === "member") renderMember();
+  else if(tab === "secretary") renderSecretary();
+  else if(tab === "chairman") renderChairman();
+  else if(tab === "files") renderFiles();
+  else if(tab === "boards") renderBoards();
+  else if(tab === "protocol") renderProtocol();
+}
+
+function renderMember(){
+  const cur = state.current_question;
+  let html = `<div class="member-layout"><div class="card agenda-card"><div class="section-kicker">ЗАСЕДАНИЕ <span>${state.questions.length} ВОПРОСОВ</span></div><h3 style="margin-top:17px">Повестка дня</h3>`;
+  html += state.questions.map(q =>
+    `<div class="row"><span><span class="agenda-index">${String(q.order_num).padStart(2,"0")}</span>${q.title} <span class="tag">${({decision:"Решение",resolution:"Резолюция",election:"Выборы",amendment:"Поправка"}[q.kind]||q.kind)}</span></span>
+     <span class="tag ${q.status==='closed'?'ok':q.status==='opened'?'warn':''}">${({pending:"Ожидает",opened:"Идёт",closed:"Завершено"}[q.status]||q.status)}</span></div>`
+  ).join("") || "<i>Пока нет вопросов</i>";
+  html += `</div>`;
+
+  if(cur){
+    html += `<div class="card vote-card"><div class="section-kicker"><span><i class="live-dot"></i>${cur.status === "opened" ? "ГОЛОСОВАНИЕ ОТКРЫТО" : "ИТОГИ ГОЛОСОВАНИЯ"}</span></div><h3>${cur.title}</h3>`;
+    if(cur.text) html += `<p>${cur.text}</p>`;
+    if(cur.status === "opened"){
+      html += `<div id="vote-timer" style="font-size:16px;margin-bottom:10px;color:#facc15"></div>`;
+      if(cur.majority_type === "plurality" && cur.results.choices){
+        html += `<p>Выберите кандидата:</p>`;
+        html += cur.results.choices.map(c =>
+          `<button class="btn vote-choice-btn" style="margin:4px" onclick="voteChoice(${cur.id}, ${c.id})">${c.text}</button>`
+        ).join("");
+      } else {
+        html += `<p>Ваш голос:</p>
+          <div class="vote-bar">
+            <button class="btn green" onclick="voteValue(${cur.id}, 'for')">ЗА</button>
+            <button class="btn red" onclick="voteValue(${cur.id}, 'against')">ПРОТИВ</button>
+            <button class="btn sec" onclick="voteValue(${cur.id}, 'abstain')">Воздержался</button>
+          </div>`;
+      }
+      html += `<div style="font-size:13px;color:#888">Проголосовало: ${cur.results.voters} из ${state.quorum.present}</div>`;
+    } else {
+      const r = cur.results;
+      html += `<div class="q-closed">
+        За: <b>${r.for}</b> · Против: <b>${r.against}</b> · Воздерж: <b>${r.abstain}</b>
+        <br>Итог: <b style="color:${r.passed?'#0a0':'#a00'}">${r.passed?'ПРИНЯТО':'НЕ ПРИНЯТО'}</b>
+        ${r.reason ? `<br><small style="color:#666">${r.reason} ${r.needed ? `(требовалось: ${r.needed})` : ''}</small>` : ''}`;
+      if(r.choices) html += `<br>Кандидаты: ` + r.choices.map(c => `${c.text} — ${c.votes}`).join(", ");
+      if(r.veto) html += `<br><span style="color:#a00"><b>ВЕТО Председателя:</b> ${r.veto.reason}` + (r.veto.overridden_at ? " (преодолено)" : " (не преодолено)") + `</span>`;
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
+
+  html += `<div class="card requests-card"><h3>Участвуйте в обсуждении</h3><p>Запросите слово или задайте вопрос.</p>
+    <button class="btn" onclick="req('speak')">Выступить</button>
+    <button class="btn" onclick="req('question')">Вопрос</button>
+    <button class="btn sec" onclick="reqDissent()">Особое мнение</button>
+    <button class="btn sec" onclick="reqConflict()">Конфликт интересов</button>
+  </div>`;
+  html += `</div>`;
+  $("#body").innerHTML = html;
+  startTimer(cur);
+}
+
+function startTimer(cur) {
+  if (timerInterval) clearInterval(timerInterval);
+  if (!cur || cur.status !== "opened" || !cur.remote_deadline) return;
+
+  timerInterval = setInterval(() => {
+    const left = Math.max(0, Math.floor(cur.remote_deadline - (Date.now() / 1000)));
+    const el = document.getElementById("vote-timer");
+    if (!el) return;
+    
+    if (left > 0) {
+      el.innerHTML = `⏳ До конца голосования: <b>${left} сек</b>`;
+      el.style.color = "#facc15";
+    } else {
+      el.innerHTML = `⛔ Время голосования истекло.`;
+      el.style.color = "#d33";
+      document.querySelectorAll(".vote-bar button, .vote-choice-btn").forEach(b => b.disabled = true);
+    }
+  }, 1000);
+}
+
+function renderSecretary(){
+  let html = `<div class="card"><h3>Отметка присутствия</h3>`;
+  html += state.members.map(m => {
+    const d = state.attendance_detail[m.id] || {status:"absent", role:"member", is_valid_excuse:false};
+    return `<div class="row">
+      <span>${m.name}${d.is_valid_excuse ? ' <span class="tag">уваж.</span>' : ''}</span>
+      <span style="display:flex;gap:6px">
+        <select style="width:auto" onchange="setAtt(${m.id}, this.value, '${d.role}', ${d.is_valid_excuse})">
+          ${["absent","present","left"].map(s =>
+            `<option value="${s}" ${s===d.status?"selected":""}>${
+              {absent:"отсутствует",present:"очно",left:"покинул"}[s]
+            }</option>`).join("")}
+        </select>
+        <button class="btn sec" onclick="toggleExcuse(${m.id}, ${!d.is_valid_excuse})">${d.is_valid_excuse ? '✕' : '⚑'}</button>
+      </span>
+    </div>`;
+  }).join("");
+  html += `</div>`;
+
+  html += `<div class="card"><h3>Новый вопрос</h3>
+    <input id="qtitle" placeholder="Формулировка">
+    <textarea id="qtext" rows="2" placeholder="Текст (опционально)"></textarea>
+    <div class="grid2">
+      <select id="qkind"><option value="decision">Решение</option><option value="resolution">Резолюция</option><option value="election">Выборы</option><option value="amendment">Поправка</option></select>
+      <select id="qvote"><option value="open">Открытое</option><option value="secret">Тайное</option><option value="roll_call">Поименное</option></select>
+      <select id="qmaj"><option value="simple">Простое большинство</option><option value="qualified_11">11 голосов</option><option value="two_thirds">2/3</option><option value="plurality">Наибольшее (выборы)</option></select>
+      <input id="qchoices" placeholder="Кандидаты через запятую (для выборов)">
+    </div>
+    <button class="btn" onclick="addQuestion()">Добавить</button>
+  </div>`;
+
+  html += `<div class="card"><h3>Вопросы</h3>`;
+  html += state.questions.map(q => {
+    const canOpen = q.status === "pending" && state.quorum.has_quorum;
+    const canClose = q.status === "opened";
+    return `<div class="row">
+      <span>${q.order_num}. ${q.title} <span class="tag">${q.kind}/${q.majority_type}</span>
+        <span class="tag ${q.status==='closed'?'ok':q.status==='opened'?'warn':''}">${q.status}</span></span>
+      <span>
+        ${canOpen ? `<button class="btn green" onclick="openQ(${q.id})">Открыть</button>` : ''}
+        ${canClose ? `<button class="btn red" onclick="closeQ(${q.id})">Закрыть</button>` : ''}
+      </span>
+    </div>`;
+  }).join("") || "<i>Пусто</i>";
+  html += `</div>`;
+
+  html += `<div class="card"><h3>Табло заседания</h3>
+    <button class="btn" onclick="genQR()">Сгенерировать QR</button>
+    <div id="qr"></div>
+  </div>`;
+  $("#body").innerHTML = html;
+}
+
+function renderChairman(){
+  const typeRu = {speak:"Выступление", question:"Вопрос", dissent:"Особое мнение", conflict:"Конфликт интересов"};
+  const pending = state.requests.filter(r => r.status === "pending");
+  let html = `<div class="card"><h3>Очередь запросов (${pending.length})</h3>`;
+  html += pending.map(r => `
+    <div class="row">
+      <span>${r.member_name} — <b>${typeRu[r.type] || r.type}</b> ${r.text ? `<br><small>${r.text}</small>` : ''}</span>
+      <span>
+        <button class="btn green" onclick="handle(${r.id},'granted')">Предоставить</button>
+        <button class="btn sec" onclick="handle(${r.id},'deferred')">Отложить</button>
+        <button class="btn red" onclick="handle(${r.id},'rejected')">Отклонить</button>
+      </span>
+    </div>`).join("") || "<i>Очередь пуста</i>";
+  html += `</div>`;
+
+  const closed = state.questions.filter(q => q.status === "closed");
+  if(me.roles.includes("chairman") && closed.length){
+    html += `<div class="card"><h3>Вето на решения</h3>`;
+    html += closed.map(q => `
+      <div class="row"><span>${q.order_num}. ${q.title}</span>
+        <button class="btn red" onclick="imposeVeto(${q.id})">Наложить вето</button>
+      </div>`).join("");
+    html += `</div>`;
+  }
+  $("#body").innerHTML = html;
+}
+
+async function renderFiles(){
+  let html = `<div class="card"><h3>Документы заседания</h3>
+    <input type="file" id="fileInput">
+    <label><input type="checkbox" id="filePublic" style="width:auto"> сделать публичной</label><br>
+    <button class="btn" onclick="uploadFile()">Загрузить</button>
+    <div id="filesList" style="margin-top:12px"></div>
+  </div>`;
+  $("#body").innerHTML = html;
+  try{
+    const files = await api(`/api/meetings/${meetingId}/files`);
+    $("#filesList").innerHTML = files.length
+      ? files.map(f => `<div class="row">
+          <span>📎 <a href="/api/files/${f.id}">${f.name}</a> <small>(${Math.round(f.size/1024)} KB)</small></span>
+          <span>${f.is_public ? `<a href="${f.public_url}" target="_blank" class="tag ok">публ. ссылка</a>` : ''}</span>
+        </div>`).join("")
+      : "<i>Файлов нет</i>";
+  }catch(e){ $("#filesList").innerHTML = "Ошибка: " + e.message; }
+}
+
+async function uploadFile(){
+  const f = $("#fileInput").files[0]; if(!f) return;
+  const fd = new FormData(); fd.append("file", f); fd.append("meeting_id", meetingId); fd.append("is_public", $("#filePublic").checked ? "true" : "false");
+  const r = await fetch("/api/files", { method:"POST", body: fd, headers: { "Authorization": "Bearer " + token }});
+  if(r.ok) renderFiles(); else alert("Ошибка загрузки");
+}
+
+async function renderBoards(){
+  let html = `<div class="card"><h3>Доски задач</h3><div id="boardsList"></div>
+    <input id="newBoardTitle" placeholder="Название новой доски">
+    <button class="btn" onclick="createBoard()">Создать доску</button>
+  </div><div id="boardContent"></div>`;
+  $("#body").innerHTML = html;
+  const boards = await api("/api/boards");
+  $("#boardsList").innerHTML = boards.map(b => `<button class="btn sec" onclick="loadBoard(${b.id})">${b.title}</button>`).join(" ") || "<i>Досок нет</i>";
+}
+
+async function createBoard(){
+  const t = $("#newBoardTitle").value.trim(); if(!t) return;
+  await api("/api/boards","POST",{title:t}); renderBoards();
+}
+
+async function loadBoard(bid){
+  const b = await api(`/api/boards/${bid}`);
+  let html = `<div class="card"><h3>${b.title}</h3><div style="display:grid;grid-template-columns:repeat(${b.columns.length},1fr);gap:8px">`;
+  for(const col of b.columns){
+    html += `<div style="background:#f0f2f5;border-radius:8px;padding:8px;min-height:150px"><div style="font-weight:600;margin-bottom:6px">${col.title}</div>`;
+    for(const card of col.cards){
+      html += `<div style="background:#fff;border-radius:6px;padding:8px;margin-bottom:6px"><div><b>${card.title}</b></div>${card.description ? `<div style="font-size:12px;color:#666">${card.description}</div>` : ''}</div>`;
+    }
+    html += `<button class="btn sec" style="width:100%;font-size:12px" onclick="addCard(${bid}, ${col.id})">+ карточка</button></div>`;
+  }
+  html += `</div></div>`;
+  $("#boardContent").innerHTML = html;
+}
+
+async function addCard(bid, colId){
+  const t = prompt("Название карточки:"); if(!t) return;
+  await api("/api/cards","POST",{column_id:colId, board_id:bid, title:t}); loadBoard(bid);
+}
+
+function renderProtocol(){
+  $("#body").innerHTML = `<div class="card"><h3>Протокол заседания</h3>
+    <p><a href="/api/meetings/${meetingId}/protocol" target="_blank" class="btn">Открыть HTML</a></p></div>`;
+}
+
+async function voteValue(qid, v){ await api(`/api/questions/${qid}/vote`,"POST",{value:v}); }
+async function voteChoice(qid, cid){ await api(`/api/questions/${qid}/vote`,"POST",{choice_id:cid}); }
+async function req(t){ await api(`/api/meetings/${meetingId}/requests`,"POST",{type:t, question_id: state.current_question?.id}); }
+async function reqDissent(){ const text = prompt("Текст особого мнения:"); if(text) await api(`/api/meetings/${meetingId}/requests`,"POST",{type:"dissent", text, question_id: state.current_question?.id}); }
+async function reqConflict(){ const text = prompt("Опишите конфликт интересов:"); if(text) await api(`/api/meetings/${meetingId}/requests`,"POST",{type:"conflict", text, question_id: state.current_question?.id}); }
+async function setAtt(id, st, role, exc){ try{ await api(`/api/meetings/${meetingId}/attendance`,"POST",{member_id:id, status:st, role, is_valid_excuse:exc}); } catch(e){ alert("Ошибка: " + e.message); } }
+async function toggleExcuse(id, val){ const d = state.attendance_detail[id]; const reason = val ? (prompt("Причина (уважительная):") || "") : null; await api(`/api/meetings/${meetingId}/attendance`,"POST",{member_id:id, status:d.status, role:d.role, is_valid_excuse:val, excuse_reason:reason}); }
+async function addQuestion(){ const choices = $("#qchoices").value.split(",").map(s=>s.trim()).filter(Boolean); await api(`/api/meetings/${meetingId}/questions`,"POST",{title: $("#qtitle").value, text: $("#qtext").value, kind: $("#qkind").value, vote_type: $("#qvote").value, majority_type: $("#qmaj").value, choices }); }
+async function openQ(id){ await api(`/api/questions/${id}/open`,"POST"); }
+async function closeQ(id){ const r = await api(`/api/questions/${id}/close`,"POST"); if(r.runoff) alert("Ничья! Объявлен 2-й тур."); }
+async function handle(id, a){ await api(`/api/requests/${id}/handle`,"POST",{action:a}); }
+async function imposeVeto(id){ const reason = prompt("Мотивировка вето:"); if(reason) await api(`/api/questions/${id}/veto`,"POST",{reason}); }
+async function genQR(){ const r = await api(`/api/meetings/${meetingId}/display-token`,"POST"); $("#qr").innerHTML = `<img src="${r.qr}" style="width:240px;margin-top:10px"><div style="font-size:12px;color:#888">${r.url}</div>`; }
+
+
+// Isolated visual preview: all actions stay in this page.
+token = null;
+meetingId = 1;
+me = {name:"Александра Новикова",roles:["member"]};
+const questions = [
+{id:1,order_num:1,title:"Утверждение повестки заседания",kind:"decision",status:"closed"},
+{id:2,order_num:2,title:"Развитие городских инициатив",kind:"decision",status:"opened",text:"О поддержке общественных проектов и формировании рабочих групп по их реализации.",majority_type:"simple",results:{voters:9,for:8,against:0,abstain:1}},
+{id:3,order_num:3,title:"План работы на следующий месяц",kind:"resolution",status:"pending"},
+{id:4,order_num:4,title:"Формирование рабочих групп",kind:"election",status:"pending"},
+{id:5,order_num:5,title:"Предложения участников совета",kind:"amendment",status:"pending"}
+];
+state = {meeting:{title:"Заседание Малого совета № 12",format:"mixed"},quorum:{present:12,total:15,needed:8,has_quorum:true},questions,current_question:questions[1],requests:[]};
+$("#login-layout").classList.add("hidden");$("#app").classList.remove("hidden");
+$("#who").textContent=me.name;$("#roles").textContent="Член совета";
+$("#meetingSelect").innerHTML='<option>Заседание № 12 · Пример</option>';
+document.body.insertAdjacentHTML("afterbegin",'<div class="demo-notice">Демонстрация дизайна · Все данные и действия — примеры</div>');
+let demoVote=null;
+voteValue=async(id,value)=>{demoVote=value;document.querySelectorAll('.vote-bar .btn').forEach(b=>{b.style.outline=b.getAttribute('onclick').includes("'"+value+"'")?'2px solid #102f32':''}); let el=document.getElementById('demo-feedback');if(!el){el=document.createElement('p');el.id='demo-feedback';document.querySelector('.vote-bar').after(el)}el.textContent='Ваш голос учтён: '+({for:'за',against:'против',abstain:'воздержался'}[value]);};
+api=async(path,method='GET',body)=>{if(method!=='GET'){alert('Демонстрация: запрос принят.');return {}}return []};
+logout=()=>{location.href='app.html'};
+switchMeeting=()=>{};
+renderProtocol=()=>{$('#body').innerHTML='<div class="card"><h3>Протокол заседания</h3><p>В рабочей системе здесь доступен протокол с результатами голосований.</p></div>'};
+renderTabs();render();
+
+</script>
+</body>
+</html>

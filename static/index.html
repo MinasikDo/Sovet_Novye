@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#102f32"><title>Малый совет — рабочее пространство</title><link rel="stylesheet" href="/static/app.css"></head>
+<body>
+<header class="topbar"><a class="brand" href="/" aria-label="Малый совет — главная"><svg viewBox="0 0 64 72" fill="currentColor" aria-hidden="true"><path d="M3 12 32 3 61 12V18H3ZM10 23H54V53H47V30L36 42V53H28V42L17 30V53H10ZM3 58H61V65H3Z"/></svg><span><strong>МАЛЫЙ СОВЕТ</strong><small>ДВИЖЕНИЕ «НОВЫЕ» · МОСКВА</small></span></a><div id="account"></div></header>
+<div id="connection" class="connection hidden" role="status"></div>
+<div id="shell"><main class="loading" aria-live="polite"><span class="spinner"></span>Подключаем рабочее пространство…</main></div>
+<dialog id="modal" aria-labelledby="dialog-title"><form id="dialog-form"><div class="dialog-head"><div><div class="eyebrow" id="dialog-eyebrow">Малый совет</div><h2 id="dialog-title"></h2></div><button type="button" class="icon-button" data-close aria-label="Закрыть окно">×</button></div><div id="dialog-fields"></div><div id="dialog-error" class="form-error" role="alert"></div><div class="dialog-actions"><button type="button" class="button secondary" data-close>Отмена</button><button type="submit" class="button" id="dialog-submit">Сохранить</button></div></form></dialog>
+<div id="toasts" aria-live="polite"></div><script type="module" src="/static/app.mjs"></script>
+</body></html>

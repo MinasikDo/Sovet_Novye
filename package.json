@@ -1,0 +1,12 @@
+{
+  "name": "maly-sovet",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Рабочее пространство Малого совета по Уставу и Регламенту",
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

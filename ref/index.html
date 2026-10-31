@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" type="image/png" href="logo.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Владимир Морозов — Кандидат в Совет Движения «Новые»</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #21b1a6;
+            --accent-dim: #1a9a90;
+            --accent-dark: #0f6b64;
+            --accent-soft: #e8f5f3;
+            --accent-glow: rgba(33, 177, 166, 0.08);
+            --canvas: #fafcf9;
+            --surface: #ffffff;
+            --border: #dde8e4;
+            --border-mid: #bccfc8;
+            --text-primary: #1a2623;
+            --text-secondary: #4a5f59;
+            --text-muted: #82958f;
+            --radius-card: 16px;
+            --radius-pill: 36px;
+            --radius-outlined: 24px;
+            --spacing-section: clamp(72px, 10vh, 120px);
+            --font: 'Unbounded', sans-serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--canvas);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ---- Fixed Top Navigation ---- */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 32px;
+            background: transparent;
+            border-bottom: 1px solid transparent;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        .nav.scrolled {
+            background: rgba(250, 252, 249, 0.9);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-logo img {
+            height: 36px;
+            width: auto;
+            display: block;
+        }
+        .nav-logo span {
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+        .nav-links a {
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+        .nav-links a:hover {
+            color: var(--text-primary);
+            border-bottom-color: var(--accent);
+        }
+        .nav-links a.active {
+            color: var(--accent-dark);
+            border-bottom-color: var(--accent);
+        }
+        @media (max-width: 768px) {
+            .nav {
+                padding: 14px 18px;
+            }
+            .nav-links {
+                gap: 14px;
+            }
+            .nav-links a {
+                font-size: 9px;
+                letter-spacing: 0.06em;
+            }
+            .nav-logo span {
+                display: none;
+            }
+        }
+
+        /* ---- Vertical Sidebar Label ---- */
+        .sidebar-label {
+            position: fixed;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%) rotate(90deg);
+            transform-origin: center;
+            z-index: 90;
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        @media (max-width: 1024px) {
+            .sidebar-label {
+                display: none;
+            }
+        }
+
+        /* ---- Section Base ---- */
+        section {
+            padding: var(--spacing-section) 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        @media (max-width: 768px) {
+            section {
+                padding: 40px 18px;
+            }
+        }
+
+        /* ---- Dashed Divider ---- */
+        .divider {
+            border: none;
+            border-top: 2px dashed var(--border);
+            margin: 0 auto;
+            max-width: 1200px;
+            padding: 0 32px;
+        }
+
+        /* ---- Hero ---- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 80px;
+            position: relative;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+            width: 100%;
+        }
+        @media (max-width: 900px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+        }
+        .hero-text {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .hero-tag {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent-dark);
+            background: var(--accent-soft);
+            border-radius: var(--radius-outlined);
+            padding: 8px 18px;
+            width: fit-content;
+        }
+        .hero-name {
+            font-size: clamp(36px, 6vw, 68px);
+            font-weight: 700;
+            text-transform: uppercase;
+            line-height: 0.95;
+            letter-spacing: -0.01em;
+        }
+        .hero-role {
+            font-size: clamp(13px, 1.5vw, 16px);
+            font-weight: 400;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 480px;
+        }
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .hero-meta span {
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border: 1px solid var(--border-mid);
+            border-radius: var(--radius-outlined);
+            background: var(--surface);
+        }
+        .hero-map {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero-map img {
+            width: 100%;
+            max-width: 520px;
+            height: auto;
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border);
+        }
+        .hero-map::after {
+            content: '';
+            position: absolute;
+            inset: -16px;
+            border-radius: calc(var(--radius-card) + 12px);
+            background: var(--accent-glow);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .hero-scroll {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-bottom: 2px dashed var(--border-mid);
+            padding-bottom: 4px;
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+        .hero-scroll:hover {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* ---- Intro Section ---- */
+        .intro {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 48px;
+        }
+        @media (max-width: 768px) {
+            .intro {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+        .intro-label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-dark);
+            background: var(--accent-soft);
+            border-radius: var(--radius-outlined);
+            padding: 10px 18px;
+            width: fit-content;
+            height: fit-content;
+        }
+        .intro-body {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .intro-body p {
+            font-size: clamp(15px, 1.6vw, 18px);
+            font-weight: 300;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 700px;
+        }
+        .intro-body p strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .intro-quote {
+            border-left: 3px solid var(--accent);
+            padding-left: 20px;
+            font-size: clamp(16px, 1.8vw, 20px) !important;
+            font-weight: 400 !important;
+            color: var(--text-primary) !important;
+            line-height: 1.5 !important;
+        }
+
+        /* ---- Program Section ---- */
+        .program-header {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 48px;
+        }
+        .program-header .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-dark);
+            background: var(--accent-soft);
+            border-radius: var(--radius-outlined);
+            padding: 6px 14px;
+            width: fit-content;
+        }
+        .program-header h2 {
+            font-size: clamp(26px, 3.6vw, 40px);
+            font-weight: 600;
+            text-transform: uppercase;
+            line-height: 1.05;
+            max-width: 780px;
+        }
+        .program-item {
+            display: grid;
+            grid-template-columns: 72px 1fr;
+            gap: 28px;
+            padding: 32px 0;
+            border-top: 1px solid var(--border);
+        }
+        .program-item:last-child {
+            border-bottom: 1px solid var(--border);
+        }
+        @media (max-width: 768px) {
+            .program-item {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 24px 0;
+            }
+        }
+        .program-number {
+            font-size: 34px;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1;
+            letter-spacing: -0.03em;
+            opacity: 0.6;
+        }
+        .program-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .program-content h3 {
+            font-size: clamp(16px, 2vw, 22px);
+            font-weight: 600;
+            text-transform: uppercase;
+            line-height: 1.15;
+            color: var(--text-primary);
+        }
+        .program-content p {
+            font-size: clamp(13px, 1.4vw, 15px);
+            font-weight: 300;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 660px;
+        }
+        .program-content p strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .program-highlight {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-dark);
+            background: var(--accent-soft);
+            border-radius: 20px;
+            padding: 4px 12px;
+            width: fit-content;
+        }
+
+        /* ---- Epilogue Section ---- */
+        .epilogue {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+        @media (max-width: 768px) {
+            .epilogue {
+                grid-template-columns: 1fr;
+                gap: 28px;
+            }
+        }
+        .epilogue-header {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .epilogue-header .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-dark);
+            background: var(--accent-soft);
+            border-radius: var(--radius-outlined);
+            padding: 6px 14px;
+            width: fit-content;
+        }
+        .epilogue-header h2 {
+            font-size: clamp(26px, 3.6vw, 40px);
+            font-weight: 600;
+            text-transform: uppercase;
+            line-height: 1.05;
+        }
+        .epilogue-points {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+        .epilogue-point {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-left: 20px;
+            border-left: 3px solid var(--accent);
+            border-radius: 0 4px 4px 0;
+        }
+        .epilogue-point h3 {
+            font-size: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-primary);
+        }
+        .epilogue-point p {
+            font-size: 13px;
+            font-weight: 300;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 500px;
+        }
+        .epilogue-point p strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* ---- Final CTA ---- */
+        .cta-section {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+            padding-top: var(--spacing-section);
+            padding-bottom: var(--spacing-section);
+            background: var(--accent-soft);
+            border-radius: var(--radius-card);
+            margin: 32px auto;
+            max-width: 1200px;
+        }
+        .cta-slogan {
+            font-size: clamp(22px, 3.6vw, 36px);
+            font-weight: 700;
+            text-transform: uppercase;
+            line-height: 1;
+            letter-spacing: 0.01em;
+        }
+        .cta-slogan .accent-word {
+            color: var(--accent-dark);
+        }
+        .cta-telegram {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 14px 32px;
+            background: var(--accent);
+            border-radius: var(--radius-pill);
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+        .cta-telegram:hover {
+            background: var(--accent-dim);
+            transform: translateY(-1px);
+        }
+        .cta-telegram svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+        .cta-note {
+            font-size: 10px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        /* ---- Footer ---- */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-logo img {
+            height: 28px;
+            width: auto;
+        }
+        .footer-meta {
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+        .footer-links a {
+            font-size: 10px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer-links a:hover {
+            color: var(--accent-dark);
+        }
+        @media (max-width: 768px) {
+            .footer {
+                padding: 16px 18px;
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fixed Top Navigation -->
+    <nav class="nav" id="nav" role="navigation" aria-label="Основная навигация">
+        <div class="nav-logo">
+            <img src="./logo.png" alt="Логотип Движения «Новые»">
+            <span>Метод отдел</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#about" class="active">Обо мне</a></li>
+            <li><a href="#program">Программа</a></li>
+            <li><a href="#why">Почему я</a></li>
+            <li><a href="#contact">Контакт</a></li>
+        </ul>
+    </nav>
+
+    <!-- Vertical Sidebar Label -->
+    <div class="sidebar-label" aria-hidden="true">Владимир Морозов — Совет «Новые»</div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-grid">
+            <div class="hero-text">
+                <div class="hero-tag">Кандидат в Совет Движения «Новые»</div>
+                <h1 class="hero-name">Владимир<br>Морозов</h1>
+                <p class="hero-role">
+                    Избираюсь по одномандатному округу по метод. отделу.<br>
+                    Фракция «Восток». Ответственный за аналитику.
+                </p>
+                <div class="hero-meta">
+                    <span>Метод. отдел</span>
+                </div>
+            </div>
+            <div class="hero-map">
+                <img src="./russia.png" alt="Карта России" loading="eager">
+            </div>
+        </div>
+        <a href="#about" class="hero-scroll">Листай вниз</a>
+    </section>
+
+    <hr class="divider" role="separator">
+
+    <!-- Intro / About Section -->
+    <section id="about" class="intro">
+        <div class="intro-label">Всем привет!</div>
+        <div class="intro-body">
+            <p>
+                Я — <strong>Владимир Морозов</strong>, и я избираюсь по одномандатным спискам от метод. отдела в Совет Движения «Новые»!
+            </p>
+            <p>
+                Не будем лишний раз вспоминать старое прошлое — ведь все мы здесь ради нового будущего, так? — и совсем немного поговорим о том, кто я такой.
+            </p>
+            <p>
+                Я вступил в движение ещё очень давно и лично видел зарождение «Новых». Сам я из фракции <strong>«Восток»</strong>, сейчас я ответственный за аналитику в метод. отделе и регулярно смотрю на то, что вы все создаёте и делаете.
+            </p>
+            <p class="intro-quote">
+                А теперь — к программе.
+            </p>
+        </div>
+    </section>
+
+    <hr class="divider" role="separator">
+
+    <!-- Program Section -->
+    <section id="program">
+        <div class="program-header">
+            <span class="section-label">Программа</span>
+            <h2>Четыре направления,<br>которые я проработаю</h2>
+        </div>
+
+        <article class="program-item">
+            <div class="program-number" aria-hidden="true">01</div>
+            <div class="program-content">
+                <span class="program-highlight">Социология</span>
+                <h3>Дальнейшая проработка МЦСИ</h3>
+                <p>
+                    Ах, опросы! Какая замечательная идея, но её нужно <strong>дальше улучшать</strong>. Моё предложение по МЦСИ — принять в число социологов больше людей, чтобы активнее этим заниматься; регулярно <strong>каждую неделю</strong> проводить по несколько опросов; публично освещать результаты; проводить опросы не только через бота, но и вживую или через личные сообщения; за факт прохождения опроса выдавать небольшое количество баллов. Возможно, даже проводить в рамках МЦСИ интервью с разными активными участниками, руководителями фракций и комитетов.
+                </p>
+            </div>
+        </article>
+
+        <article class="program-item">
+            <div class="program-number" aria-hidden="true">02</div>
+            <div class="program-content">
+                <span class="program-highlight">Дискуссия</span>
+                <h3>Дебаты, дебаты, дебаты!!!!</h3>
+                <p>
+                    Сейчас клуб дебатов активно развивается — я всеми руками «за», но есть одна вещь, которую хотелось бы добавить: <strong>уроки риторики и полемики</strong>. Многие из наших участников — не профессиональные дебатёры или полемисты, а нам важно повышать уровень дискуссии в Движении. Нужно проводить в рамках клуба дебатов небольшие встречи с уроками риторики, чтобы больше людей хотели выступать и не боялись запинок или проигрышей.
+                </p>
+            </div>
+        </article>
+
+        <article class="program-item">
+            <div class="program-number" aria-hidden="true">03</div>
+            <div class="program-content">
+                <span class="program-highlight">Признание</span>
+                <h3>Топы</h3>
+                <p>
+                    Кроме топов команд, участников и фракций нужно ввести практику <strong>награждения лучших участников Движения в определённой сфере за месяц</strong>. Твоё видео набрало больше просмотров, чем у других, и вызвало бурное обсуждение? Что ж, теперь ты — «ТОП-МЕДИЙЩИК МЕСЯЦА». Провёл самую интересную акцию? Для тебя — «ТОП-АКЦИЯ МЕСЯЦА». Таких наград будет много, чтобы у людей было больше мотивации быть активными в Движении и делать этот мир ещё лучше.
+                </p>
+            </div>
+        </article>
+
+        <article class="program-item">
+            <div class="program-number" aria-hidden="true">04</div>
+            <div class="program-content">
+                <span class="program-highlight">Поддержка</span>
+                <h3>Методички!!!</h3>
+                <p>
+                    У многих в Движении появляются вопросы или возникают проблемы, на которые ответа нет. Исправим! Вместе с метод. отделом мы продолжим разрабатывать и улучшать методички для комитетов, сделаем единую <strong>«МЕТОДИЧКУ УЧАСТНИКА»</strong>, в которой разберём все возможные проблемы и вопросы. Если какие-то вопросы останутся без ответа — в топик чата актива регулярно будем выкладывать посты с мини-методичками и даже видео-объяснениями, где будем отвечать на насущные вопросы и помогать участникам решать проблемы в их командах и фракциях.
+                </p>
+            </div>
+        </article>
+    </section>
+
+    <hr class="divider" role="separator">
+
+    <!-- Epilogue / Why Me Section -->
+    <section id="why" class="epilogue">
+        <div class="epilogue-header">
+            <span class="section-label">Послесловие</span>
+            <h2>Почему<br>всё-таки я?</h2>
+        </div>
+        <div class="epilogue-points">
+            <div class="epilogue-point">
+                <h3>Во-первых</h3>
+                <p>
+                    Я уверен, что смогу добиться всего того, что описал выше. Если вы хотите больше разнообразия, больше веселья и больше интересных событий — вперёд, голосуйте за меня! Опыт в создании тех вещей, которые я описывал, у меня уже есть, так что будьте уверены — всё будет на высшем уровне.
+                </p>
+            </div>
+            <div class="epilogue-point">
+                <h3>Во-вторых</h3>
+                <p>
+                    Будьте уверены: отдавая голос за меня, вы отдаёте голос <strong>за себя</strong>. За продвижение своих инициатив, за улучшение своей жизни в Движении, за своё будущее. Если вы захотите, чтобы в Совете была освещена какая-то ваша проблема или проработана ваша инициатива — вперёд, я всегда здесь. Я представлю вашу идею в Совете.
+                </p>
+                <p>
+                    В этом ведь и смысл нашего Движения — быть добрыми друг к другу, вместе продвигать действительно ценные идеи ради по-настоящему счастливого и лучшего будущего.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section id="contact" class="cta-section">
+        <h2 class="cta-slogan">
+            Вместе —<br>к <span class="accent-word">лучшему будущему</span>!
+        </h2>
+        <a href="https://t.me/mrzvnovye" class="cta-telegram" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9.04 15.36l-.36 4.97c.51 0 .73-.22 1-.49l2.4-2.28 4.98 3.61c.91.5 1.56.23 1.8-.85l3.27-15.2c.29-1.35-.49-1.87-1.38-1.54L2.04 9.35c-1.31.5-1.29 1.22-.22 1.55l4.87 1.51L17.9 5.6c.53-.34 1.01-.15.61.19L9.04 15.36z" />
+            </svg>
+            МОРОЗОВ — НОВЫЕ | К ЛУЧШЕМУ БУДУЩЕМУ
+        </a>
+        <p class="cta-note">Пора просыпаться.</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-logo">
+            <img src="./logo.png" alt="Логотип Движения «Новые»">
+            <span class="footer-meta">Владимир Морозов · Совет «Новые»</span>
+        </div>
+        <ul class="footer-links">
+            <li><a href="#about">Обо мне</a></li>
+            <li><a href="#program">Программа</a></li>
+            <li><a href="#why">Почему я</a></li>
+            <li><a href="#contact">Контакт</a></li>
+        </ul>
+    </footer>
+
+    <script>
+        const nav = document.getElementById('nav');
+        const onScroll = () => {
+            if (window.scrollY > 40) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    </script>
+</body>
+</html>
